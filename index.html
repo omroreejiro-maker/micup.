@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MicUp: practice speaking with confidence</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e4f6f1;--card:#fff;--ink:#12403c;--mute:#4f7a74;--acc:#0b8a74;--accink:#fff;--sun:#ffd166;--line:#c3e6dd;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f2a27;--card:#17403a;--ink:#e8fbf6;--mute:#a5d3c9;--acc:#3fd0b0;--accink:#10201c;--sun:#d9aa5c;--line:#2d443f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f2a27;--card:#17403a;--ink:#e8fbf6;--mute:#a5d3c9;--acc:#3fd0b0;--accink:#10201c;--sun:#d9aa5c;--line:#2d443f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.5}
+main{max-width:520px;margin:0 auto;padding:20px 18px 110px}
+h1{font-size:30px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+h2{font-size:22px;font-weight:800;margin:0 0 8px}
+p{margin:0 0 12px}.mute{color:var(--mute);font-size:15px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin:16px 0}
+.task{font-size:24px;font-weight:800;line-height:1.3}
+.pill{display:inline-block;background:var(--bg);border-radius:99px;padding:3px 12px;font-size:14px;font-weight:600;color:var(--mute);margin-bottom:10px}
+button{font:inherit;font-weight:800;border:0;border-radius:99px;padding:13px 22px;background:var(--acc);color:var(--accink);cursor:pointer}
+button.alt{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.5}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+textarea,input[type=text],select{width:100%;font:inherit;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:6px 0 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mic{width:84px;height:84px;border-radius:50%;font-size:30px;padding:0;display:grid;place-items:center;margin:8px auto}
+.mic.on{background:#d96a6a;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(217,106,106,.2)}}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}}
+.big{font-size:54px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+nav button{background:none;color:var(--mute);padding:10px 18px}
+nav button[aria-current=true]{background:var(--bg);color:var(--ink)}
+.score{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:110px;margin-top:10px}
+.bars i{flex:1;background:var(--acc);border-radius:8px 8px 0 0;min-height:4px}
+.streak{font-size:40px;font-weight:800;color:var(--ink)}h1{color:var(--acc)}.btn{display:inline-block;text-decoration:none;font-weight:800;border-radius:99px;padding:13px 22px;background:var(--acc);color:var(--accink)}.warn{font-size:14px;color:var(--mute);background:var(--bg);border-radius:14px;padding:10px 12px;margin-top:10px}.pill{background:var(--sun);color:#3a2a00}.ov{position:fixed;inset:0;background:rgba(10,30,28,.6);display:grid;place-items:center;padding:20px;z-index:50}.tc{background:var(--card);border-radius:24px;padding:24px;max-width:380px;width:100%;text-align:center}.tc .row{justify-content:center}.ti{font-size:52px}
+</style></head><body>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+(async()=>{
+const T=[["Greeting","Greet three people you pass today with a clear “Good morning” or “Good afternoon.”"],["Greeting","Greet a shop owner, then ask how their day is going."],["Greeting","Greet a neighbor by name and hold eye contact for two seconds."],
+["Compliment","Compliment a stranger on something they chose, like their bag or shoes."],["Compliment","Tell a seller their goods look fresh or well made."],["Compliment","Compliment someone’s skill, like a driver, tailor or cook."],
+["Question","Ask a stranger where they got something they’re wearing."],["Question","Ask someone for a recommendation, like the best place to eat nearby."],["Question","Ask a stranger what the best part of their day has been."],
+["Awkward","Ask a shopkeeper for their “famous opinion” on the weather."],["Awkward","Say “good job” to someone doing ordinary work, like sweeping."],["Awkward","Ask a stranger a silly but harmless question, like “Tea or coffee person?”"]];
+const TOPICS=["The best advice I ever got","A place I want to visit","Something I learned the hard way","Why my work matters","A person who inspired me","A problem in my community and one fix"];
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const day=()=>new Date().toISOString().slice(0,10);
+let did=false,db=null,sample=null,col=null,E=[],tab="today",rec=null,live=false,uid=null;
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLScE3u0O240S0txgoPj9WpfH-6dZcn5BQiMxckLHE6JHjPEXhQ/viewform";
+try{E=JSON.parse(localStorage.getItem("micup_data")||"[]")}catch(e){E=[]}
+function fbCard(){if(FORM_URL.startsWith("PASTE"))return;$("#app").insertAdjacentHTML("beforeend",`<div class="card"><h2>Help us improve MicUp</h2><p class="mute">Anonymous. No name or number needed.</p><a class="btn" href="${FORM_URL}" target="_blank" rel="noopener">Give feedback</a></div>`)}
+function localScore(text,secs,wpm,fill,conf){const w=text.trim().split(/\s+/).length,cl=v=>Math.max(1,Math.min(10,Math.round(v)));const pace=cl(10-Math.abs(wpm-130)/12),fillers=cl(10-(fill/w*100)*1.6),clarity=conf?cl(conf*10):7,confidence=cl((pace+fillers+clarity)/3+(secs>=60?.5:0));const tip=fill/w>.06?"Try pausing silently instead of saying fillers like “um” or “like.”":wpm>170?"You spoke fast. Slow down a little and let key points land.":wpm<100?"Try speaking a bit faster and with more energy.":"Nice steady pace. Next time, try a stronger opening line.";return{confidence,clarity,pace,fillers,tip}}
+async function save(x){E.push(x);try{localStorage.setItem("micup_data",JSON.stringify(E))}catch(e){}}
+const todays=()=>{let h=0;for(const c of day())h=(h*31+c.charCodeAt(0))%T.length;return T[h]};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function listen(box,btn){if(!SR){box.placeholder="Voice isn’t available in this browser. Type instead.";return}
+if(live){rec.stop();return}
+rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang="en-US";const base=box.value?box.value+" ":"";
+rec.onresult=e=>{let t="",c=0,n=0;for(const r of e.results){t+=r[0].transcript;if(r[0].confidence){c+=r[0].confidence;n++}}box.value=base+t;if(n)box.dataset.conf=c/n};
+rec.onend=()=>{live=false;btn.classList.remove("on")};rec.onerror=()=>{live=false;btn.classList.remove("on");box.placeholder="Couldn’t reach the microphone. Allow access or type instead."};
+rec.start();live=true;btn.classList.add("on")}
+function streak(){const d=new Set(E.filter(e=>e.kind=="task").map(e=>e.date));let n=0,c=new Date();if(!d.has(day()))c.setDate(c.getDate()-1);
+while(d.has(c.toISOString().slice(0,10))){n++;c.setDate(c.getDate()-1)}return n}
+function nav(){$("#nav").innerHTML=[["today","🎯 Today"],["speak","🎙 Speak"],["progress","📈 Progress"]].map(([k,l])=>`<button data-t="${k}" aria-current="${tab==k}">${l}</button>`).join("");
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(live)rec.stop();tab=b.dataset.t;draw()})}
+function today(){const[t,x]=todays(),done=E.some(e=>e.kind=="task"&&e.date==day());
+$("#app").innerHTML=`<div class="row" style="justify-content:space-between"><h1>MicUp</h1><button class="alt" id="help" aria-label="How it works">? Help</button></div><p class="mute">Small steps, big voice.</p>
+<div class="card"><span class="pill">Today’s task · ${t}</span><div class="task">${esc(x)}</div></div>
+${done?`<div class="card"><h2>Done for today</h2><p class="mute">Come back tomorrow for a new task, or try a speaking session.</p></div>`:`
+${!did?`<div class="card"><h2>Step 1: Do the task</h2><p class="mute">Go out and try it. Come back when you’re done.</p><button id="did">I did it ✓</button></div>`:`<div class="card"><h2>Step 2: How did it go?</h2>
+<label>How scared were you? <b id="fv">5</b>/10</label><input type="range" id="fear" min="1" max="10" value="5">
+<p class="mute" style="margin-top:14px">Tap the mic and tell what happened and how you felt.</p>
+<button class="mic" id="mic" aria-label="Record">🎙</button>
+<textarea id="note" rows="4" placeholder="Your words appear here. You can edit them."></textarea>
+<select id="vis"><option value="private">Keep private</option><option value="shared">Share</option></select>
+<button id="done">Save and mark done</button></div>`}`}`;
+$("#help").onclick=()=>tour();if(!done&&!did)$("#did").onclick=()=>{did=true;today()};if(!done&&did){$("#fear").oninput=e=>$("#fv").textContent=e.target.value;$("#mic").onclick=()=>listen($("#note"),$("#mic"));
+$("#done").onclick=async()=>{if(live)rec.stop();await save({kind:"task",date:day(),type:t,fear:+$("#fear").value,note:$("#note").value,vis:$("#vis").value});did=false;today()}}}
+function speak(){const n=E.filter(e=>e.kind=="speech").length,mins=Math.min(5,1+Math.floor(n/3));
+$("#app").innerHTML=`<h1>Speak</h1><p class="mute">Your next session is ${mins} minute${mins>1?"s":""}. Sessions grow as you practice.</p>
+<div class="card"><label for="topic">Topic</label><input type="text" id="topic" placeholder="Type your own topic"><div class="row"><button class="alt" id="sug">Suggest a topic</button></div></div>
+<div class="card" id="stage"><div class="big" id="clock">${mins}:00</div><button class="mic" id="mic" aria-label="Start speaking">🎙</button><p class="mute" style="text-align:center">Tap the mic to start. Tap again to finish.</p><p class="warn">Practice score only: judged on pace, filler words and how clearly you’re heard, not on your ideas.</p><div id="res"></div></div>`;
+$("#sug").onclick=()=>$("#topic").value=TOPICS[Math.floor(Math.random()*TOPICS.length)];
+let tm=null,left=mins*60,box=document.createElement("textarea");
+const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+$("#mic").onclick=async()=>{if(!live){if(!SR){$("#res").innerHTML=`<p>Voice isn’t available in this browser. Try Chrome or Safari.</p>`;return}
+listen(box,$("#mic"));left=mins*60;tm=setInterval(()=>{left--;$("#clock").textContent=fmt(Math.max(left,0));if(left<=0){rec.stop()}},1000);
+const end=rec.onend;rec.onend=async()=>{end();clearInterval(tm);await rate(box.value,mins*60-Math.max(left,0),$("#topic").value||"Free topic",+box.dataset.conf||0)}}else rec.stop()}}
+async function rate(text,secs,topic,conf){const R=$("#res");const w=text.trim().split(/\s+/).filter(Boolean).length;
+if(w<15){R.innerHTML=`<p>That was too short to rate. Try speaking for a little longer.</p>`;return}
+const wpm=Math.round(w/Math.max(secs/60,.5)),fill=(text.match(/\b(um+|uh+|like|you know|basically|actually)\b/gi)||[]).length;
+let s=null;R.innerHTML=`<p class="mute">Rating your speech…</p>`;
+s=localScore(text,secs,wpm,fill,conf)
+if(!s){R.innerHTML=`<p>Rating isn’t available right now. You spoke ${w} words at ${wpm} per minute with ${fill} filler words.</p>`;await save({kind:"speech",date:day(),topic,wpm,fill});return}
+await save({kind:"speech",date:day(),topic,wpm,fill,c:s.confidence,cl:s.clarity,p:s.pace,f:s.fillers});
+R.innerHTML=`<h2>Your rating</h2>${[["Confidence",s.confidence],["Clarity",s.clarity],["Pace ("+wpm+" wpm)",s.pace],["Filler words ("+fill+")",s.fillers]].map(([a,b])=>`<div class="score"><span>${a}</span><b>${esc(b)}/10</b></div>`).join("")}<p style="margin-top:12px">${esc(s.tip)}</p><p class="warn">How this score works: it checks your pace (about 130 words per minute is ideal), filler words, and how clearly your speech was heard. It can’t judge your ideas or tone of voice. Use it as a practice guide, not a verdict.</p>`}
+function progress(){const t=E.filter(e=>e.kind=="task"),sp=E.filter(e=>e.kind=="speech"&&e.c);
+$("#app").innerHTML=`<h1>Progress</h1><div class="card"><div class="streak">${streak()} day streak</div><p class="mute">${t.length} tasks done, ${E.filter(e=>e.kind=="speech").length} speaking sessions</p></div>
+<div class="card"><h2>Fear score over time</h2>${t.length?`<div class="bars" role="img" aria-label="Fear scores">${t.slice(-14).map(e=>`<i style="height:${e.fear*10}%" title="${e.fear}/10"></i>`).join("")}</div><p class="mute" style="margin-top:8px">Lower bars mean less fear. Last ${Math.min(14,t.length)} tasks.</p>`:`<p class="mute">Finish your first task to see this chart.</p>`}</div>
+<div class="card"><h2>Speaking scores</h2>${sp.length?sp.slice(-5).reverse().map(e=>`<div class="score"><span>${esc(e.topic).slice(0,34)}</span><b>${e.c}·${e.cl}·${e.p}·${e.f}</b></div>`).join("")+`<p class="mute" style="margin-top:8px">Order: confidence, clarity, pace, filler words.</p>`:`<p class="mute">Do a speaking session to see scores here.</p>`}</div>`}
+const STEPS=[["🎯","Your daily task","Each day you get one small task to do in real life, like greeting a stranger."],["✓","I did it","Tap this after you try the task. Then you can tell how it went."],["😬","Fear slider","Slide to show how scared you felt. 1 is calm, 10 is very scared."],["🎙","Mic","Tap it and talk about what happened and how you felt. Tap again to stop. Your words turn into text."],["⏱","Speak tab","Pick a topic and talk. Sessions start short and grow. You get scores for confidence, clarity, pace and filler words."],["📈","Progress tab","See your streak and watch your fear score go down over time."]];
+function tour(i=0){const o=document.createElement("div");o.className="ov";o.setAttribute("role","dialog");const[ic,t,x]=STEPS[i],last=i==STEPS.length-1;o.innerHTML=`<div class="tc"><div class="ti">${ic}</div><h2>${t}</h2><p>${x}</p><div class="row"><button id="tn">${last?"Start":"Next"}</button><button class="alt" id="ts">Skip</button></div><p class="mute" style="margin:12px 0 0">${i+1} of ${STEPS.length}</p></div>`;document.body.appendChild(o);const close=()=>{o.remove();try{localStorage.setItem("micup_seen","1")}catch(e){}};$("#ts").onclick=close;$("#tn").onclick=()=>{o.remove();last?close():tour(i+1)}}
+let first=true;
+function draw(){nav();({today,speak,progress})[tab]();fbCard();if(first){first=false;try{if(!localStorage.getItem("micup_seen"))tour()}catch(e){tour()}}}
+draw();
+})();
+</script></body></html>
